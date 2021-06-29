@@ -16,7 +16,9 @@ const List = (props) => {
     
   }, []);
   
-  if (shouldScroll && scrollTarget.current) {
+  if (shouldScroll && scrollTarget.current) { 
+  // scrollTarget.current 를 두번(리덕스 데이터 불러올때, 파이어스토어 데이터 불러올때) 불러오는데
+  // 리덕스 데이터때에는 scrollTarget.current 값이 없으므로 scrollTarget.current가 있을때만 scroll되도록 한다.
     scrollTarget.current.scrollIntoView({behavior: 'smooth', block: 'end'})
   }
 
