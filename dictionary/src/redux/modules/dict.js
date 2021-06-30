@@ -5,7 +5,7 @@ const dict_db = firestore.collection("new_coined_word_dict");
 const LOAD = "dict/LOAD";
 const CREATE = "dict/CREATE";
 const DELETE = "dict/DELETE";
-// const UPDATE = "dict/UPDATE";
+const UPDATE = "dict/UPDATE";
 const SCROLL = "dict/SCROLL";
 
 const initialState = {
@@ -26,9 +26,9 @@ export const deleteDict = (id) => {
   return { type: DELETE, id };
 };
 
-// export const updateDict = (dict) => {
-//   return { type: UPDATE, dict };
-// };
+export const updateDict = (dict) => {
+  return { type: UPDATE, dict };
+};
 
 export const scroll = (scroll) => {
   return { type: SCROLL, scroll };
@@ -64,9 +64,18 @@ export const createDictFB = (dict) => {
   return function (dispatch) {
     let adding_dict = { word: dict.word, desc: dict.desc, exam: dict.exam };
     dict_db.add(adding_dict).then((doc) => {
-      adding_dict = { ...adding_dict, id: doc.id };
-      dispatch(createDict(adding_dict));
-      dispatch(scroll(true));
+      dict_db
+        .doc(doc.id)
+        .get()
+        .then((doc) => {
+          adding_dict = {
+            ...adding_dict,
+            id: doc.id,
+            created_at: doc._delegate._document.version.timestamp.seconds,
+          };
+          dispatch(createDict(adding_dict));
+          dispatch(scroll(true));
+        });
     });
   };
 };
@@ -84,6 +93,31 @@ export const deleteDictFB = (dict) => {
       .delete()
       .then((res) => {
         dispatch(deleteDict(dict));
+        dispatch(scroll(false));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+};
+
+export const updateDictFB = (dict) => {
+  return function (dispatch, getState) {
+    const updating_dict = getState().dict.list.filter((l, idx) => {
+      return l.id === dict.id;
+    });
+    if (!updating_dict) {
+      return;
+    }
+    console.log(updating_dict[0].id);
+    console.log({ ...dict, created_at: updating_dict[0].created_at });
+    dict_db
+      .doc(updating_dict[0].id)
+      .update({ ...dict, created_at: updating_dict[0].created_at })
+      .then((res) => {
+        dispatch(
+          updateDict({ ...dict, created_at: updating_dict[0].created_at })
+        );
       })
       .catch((error) => {
         console.log(error);
@@ -116,17 +150,17 @@ export default function reducer(state = initialState, action) {
       // ...state.list를 해버리면 지워야할 객체를 함께 담아버리는꼴임.
     }
 
-    // case "dict/UPDATE": {
-    //   const new_dict = action
-    //   const new_dict_list = state.list.map((l,idx) => {
-    //     if (action.num !== l.id) {
-    //       return new_dict
-    //     } else {
-    //       return l
-    //     }
-    //     return {list: [...state.list, new_dict_list]}
-    //   })
-    // }
+    case "dict/UPDATE": {
+      const new_dict = action.dict;
+      const new_dict_list = state.list.map((l, idx) => {
+        if (new_dict.id === l.id) {
+          return new_dict;
+        } else {
+          return l;
+        }
+      });
+      return { ...state, list: new_dict_list };
+    }
 
     case "dict/SCROLL":
       return { ...state, scroll: action.scroll };

@@ -1,10 +1,10 @@
-import React, {useState, useRef, useEffect} from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import {TextField, Button} from "@material-ui/core"
-import SaveIcon from '@material-ui/icons/Save';
-import './Write.css'
-import { useDispatch, useSelector } from "react-redux";
-import {createDictFB} from "./redux/modules/dict"
+import { TextField, Button } from "@material-ui/core";
+import SaveIcon from "@material-ui/icons/Save";
+import "./Write.css";
+import { useDispatch } from "react-redux";
+import { createDictFB, updateDictFB } from "./redux/modules/dict";
 import { withRouter } from "react-router";
 
 const Write = (props) => {
@@ -15,41 +15,60 @@ const Write = (props) => {
   const descInput = useRef();
   const examInput = useRef();
   const dispatch = useDispatch();
-  
-  useEffect(() => {
-    
-  }, []);
-  
+
+  useEffect(() => {}, []);
+
   const submit = () => {
-    if (wordInput.current.value.length && descInput.current.value.length && examInput.current.value.length) {
-      dispatch(createDictFB({word: wordInput.current.value, desc: descInput.current.value, exam: examInput.current.value}));
-      props.history.push('/')
+    if (
+      wordInput.current.value.length &&
+      descInput.current.value.length &&
+      examInput.current.value.length
+    ) {
+      if (props.isEdit) {
+        dispatch(
+          updateDictFB({
+            id: props.dictId,
+            word: wordInput.current.value,
+            desc: descInput.current.value,
+            exam: examInput.current.value,
+          })
+        );
+      } else {
+        dispatch(
+          createDictFB({
+            word: wordInput.current.value,
+            desc: descInput.current.value,
+            exam: examInput.current.value,
+          })
+        );
+        props.history.push("/");
+      }
     } else {
       if (wordInput.current.value === "") {
-        setWordEmpty(true)
+        setWordEmpty(true);
       } else {
-        setWordEmpty(false)
+        setWordEmpty(false);
       }
-      
+
       if (descInput.current.value === "") {
-        setDefEmpty(true)
+        setDefEmpty(true);
       } else {
-        setDefEmpty(false)
+        setDefEmpty(false);
       }
-      
+
       if (examInput.current.value === "") {
-        setExamEmpty(true)
+        setExamEmpty(true);
       } else {
-        setExamEmpty(false)
+        setExamEmpty(false);
       }
     }
-  }
-  
+  };
+
   return (
     <WriteWrap>
       <InputCont>
-        {
-          wordEmpty ? <TextField
+        {wordEmpty ? (
+          <TextField
             id="new-coined-word"
             label="신조어"
             placeholder="신조어를 입력해주세요"
@@ -59,7 +78,20 @@ const Write = (props) => {
             inputRef={wordInput}
             error
             autoComplete="off"
-          /> : <TextField
+          />
+        ) : props.isEdit ? (
+          <TextField
+            id="new-coined-word"
+            label="신조어"
+            placeholder="신조어를 입력해주세요"
+            variant="outlined"
+            fullWidth
+            inputRef={wordInput}
+            autoComplete="off"
+            defaultValue={props.oneDict.word}
+          />
+        ) : (
+          <TextField
             id="new-coined-word"
             label="신조어"
             placeholder="신조어를 입력해주세요"
@@ -68,11 +100,11 @@ const Write = (props) => {
             inputRef={wordInput}
             autoComplete="off"
           />
-        }
+        )}
       </InputCont>
       <InputCont>
-        {
-          defEmpty ? <TextField
+        {defEmpty ? (
+          <TextField
             id="description"
             label="설명"
             placeholder="설명을 입력해주세요"
@@ -84,8 +116,22 @@ const Write = (props) => {
             multiline
             rows={2}
             autoComplete="off"
-          /> : <TextField
-            
+          />
+        ) : props.isEdit ? (
+          <TextField
+            id="description"
+            label="설명"
+            placeholder="설명을 입력해주세요"
+            variant="outlined"
+            fullWidth
+            inputRef={descInput}
+            multiline
+            rows={2}
+            autoComplete="off"
+            defaultValue={props.oneDict.desc}
+          />
+        ) : (
+          <TextField
             id="description"
             label="설명"
             placeholder="설명을 입력해주세요"
@@ -96,11 +142,11 @@ const Write = (props) => {
             rows={2}
             autoComplete="off"
           />
-        }
+        )}
       </InputCont>
       <InputCont>
-        {
-          examEmpty ? <TextField
+        {examEmpty ? (
+          <TextField
             id="example"
             label="예문"
             placeholder="예문을 입력해주세요"
@@ -112,21 +158,50 @@ const Write = (props) => {
             multiline
             rows={2}
             autoComplete="off"
-          /> : <TextField
+            // onKeyUp={(e) => {
+            //   if (e.key === "Enter") {
+            //     submit();
+            //   }
+            // }}
+          />
+        ) : props.isEdit ? (
+          <TextField
             id="example"
             label="예문"
             placeholder="예문을 입력해주세요"
             variant="outlined"
             fullWidth
-            helperText="예문을 입력해주세요."
             inputRef={examInput}
             multiline
             rows={2}
             autoComplete="off"
+            defaultValue={props.oneDict.exam}
+            // onKeyUp={(e) => {
+            //   if (e.key === "Enter") {
+            //     submit();
+            //   }
+            // }}
           />
-        }
+        ) : (
+          <TextField
+            id="example"
+            label="예문"
+            placeholder="예문을 입력해주세요"
+            variant="outlined"
+            fullWidth
+            inputRef={examInput}
+            multiline
+            rows={2}
+            autoComplete="off"
+            // onKeyUp={(e) => {
+            //   if (e.key === "Enter") {
+            //     submit();
+            //   }
+            // }}
+          />
+        )}
       </InputCont>
-      
+
       <Button
         variant="contained"
         color="primary"
@@ -135,7 +210,7 @@ const Write = (props) => {
         onClick={submit}
         fullWidth
         style={{
-          marginTop: '30px'
+          marginTop: "30px",
         }}
       >
         Save

@@ -1,38 +1,30 @@
-import React from 'react';
-import styled from 'styled-components'
-import './App.css'
-import List from './List';
-import Write from './Write';
+import React from "react";
+import styled from "styled-components";
+import "./App.css";
+import List from "./List";
+import Write from "./Write";
 import { Route } from "react-router-dom";
 import { withRouter } from "react-router";
-import { firestore } from "./firebase";
-import {loadDictFB} from "./redux/modules/dict"
-import {connect} from 'react-redux';
+import { loadDictFB } from "./redux/modules/dict";
+import { connect } from "react-redux";
 
-const mapStateToProps = (state) => ({
-  
-});
+const mapStateToProps = (state) => ({});
 
 const mapDispatchToProps = (dispatch) => ({
   load: () => {
     dispatch(loadDictFB());
   },
-  create: () => {
-    
-  }
+  create: () => {},
 });
 
 class App extends React.Component {
-  
-  componentDidMount () {
+  componentDidMount() {
     this.props.load(); // 컴포넌트 최초 렌더링 시 db 데이터를 받아옴
   }
 
-  constructor(props){
+  constructor(props) {
     super(props);
-    this.state = {
-      
-    };
+    this.state = {};
   }
 
   render() {
@@ -40,11 +32,11 @@ class App extends React.Component {
       <div className="App">
         <Container>
           <Title>
-            {this.props.history.location.pathname === "/" && '신조어 사전'}
-            {this.props.history.location.pathname === "/write" && '단어 등록'}
+            {this.props.history.location.pathname === "/" && "신조어 사전"}
+            {this.props.history.location.pathname === "/write" && "단어 등록"}
           </Title>
-          <Route exact path="/" render={(props) => (<List />)} />
-          <Route path="/write" render={(props) => (<Write />)} />
+          <Route exact path="/" render={(props) => <List />} />
+          <Route path="/write" render={(props) => <Write />} />
         </Container>
       </div>
     );
@@ -68,19 +60,19 @@ const Container = styled.div`
 
 const Title = styled.div`
   @font-face {
-    font-family: 'ONE-Mobile-POP';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/ONE-Mobile-POP.woff') format('woff');
+    font-family: "ONE-Mobile-POP";
+    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/ONE-Mobile-POP.woff")
+      format("woff");
     font-weight: normal;
     font-style: normal;
   }
   font-family: ONE-Mobile-POP;
   text-align: center;
   box-shadow: rgb(38, 57, 77) 0px 5px 30px -10px;
-  background-color: #0A174E;
-  color: #F5D042;
+  background-color: #0a174e;
+  color: #f5d042;
   padding: 20px 0;
-  font-size: 24px
+  font-size: 24px;
 `;
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(App));
