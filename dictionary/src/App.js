@@ -46,8 +46,6 @@ class App extends React.Component {
           <Route exact path="/" render={(props) => (<List />)} />
           <Route path="/write" render={(props) => (<Write />)} />
         </Container>
-        
-        
       </div>
     );
   }

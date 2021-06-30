@@ -1,16 +1,16 @@
-import {firestore} from "../../firebase"
-const dict_db = firestore.collection("new_coined_word_dict")
+import { firestore } from "../../firebase";
+const dict_db = firestore.collection("new_coined_word_dict");
 
 // Actions
 const LOAD = "dict/LOAD";
 const CREATE = "dict/CREATE";
-// const DELETE = "dict/DELETE";
+const DELETE = "dict/DELETE";
 // const UPDATE = "dict/UPDATE";
 const SCROLL = "dict/SCROLL";
 
 const initialState = {
   list: [],
-  scroll: false
+  scroll: false,
 };
 
 // Action Creators
@@ -22,9 +22,9 @@ export const createDict = (dict) => {
   return { type: CREATE, dict };
 };
 
-// export const deleteDict = (num) => {
-//   return { type: DELETE, num };
-// };
+export const deleteDict = (id) => {
+  return { type: DELETE, id };
+};
 
 // export const updateDict = (dict) => {
 //   return { type: UPDATE, dict };
@@ -40,28 +40,55 @@ export const loadDictFB = () => {
       let dict_data = [];
       docs.forEach((doc) => {
         if (doc.exists) {
-          dict_data = [...dict_data, {id: doc.id, created_at: doc._delegate._document.version.timestamp.seconds, ...doc.data()}]
+          dict_data = [
+            ...dict_data,
+            {
+              id: doc.id,
+              created_at: doc._delegate._document.version.timestamp.seconds,
+              ...doc.data(),
+            },
+          ];
           // 파이어스토어의 특성 상 data id값에 의해 정렬되는데 나는 등록된 시간 순서에 따라 정렬하고 싶었음.
-          dict_data.sort(function(a, b)  {
+          dict_data.sort(function (a, b) {
             return a.created_at - b.created_at;
           });
           // data를 리덕스 스토어에 넣고 created_at에 의해 정렬될 수 있게 한다.
         }
-      })
+      });
       dispatch(loadDict(dict_data));
-    })
-  }
+    });
+  };
 };
 
 export const createDictFB = (dict) => {
   return function (dispatch) {
-    let adding_dict = {word: dict.word, desc: dict.desc, exam: dict.exam}
+    let adding_dict = { word: dict.word, desc: dict.desc, exam: dict.exam };
     dict_db.add(adding_dict).then((doc) => {
-      adding_dict = {...adding_dict, id: doc.id}
+      adding_dict = { ...adding_dict, id: doc.id };
       dispatch(createDict(adding_dict));
       dispatch(scroll(true));
     });
-  }
+  };
+};
+
+export const deleteDictFB = (dict) => {
+  return function (dispatch, getState) {
+    const deleting_dict = getState().dict.list.filter((l, idx) => {
+      return l.id === dict;
+    });
+    if (!deleting_dict) {
+      return;
+    }
+    dict_db
+      .doc(deleting_dict[0].id)
+      .delete()
+      .then((res) => {
+        dispatch(deleteDict(dict));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 };
 
 // Reducer
@@ -70,22 +97,25 @@ export default function reducer(state = initialState, action) {
     // do reducer stuff
     case "dict/LOAD": {
       if (action.dict.length) {
-        return {...state, list: action.dict}
+        return { ...state, list: action.dict };
       }
-      return state
+      return state;
     }
 
     case "dict/CREATE":
       const new_dict_list = [...state.list, action.dict];
-      return {...state, list: new_dict_list};
+      return { ...state, list: new_dict_list };
 
-    // case "dict/DELETE": {
-    //   const new_dict_list = state.list.filter((l, idx) => {
-    //     return action.num !== l.id
-    //   })
-    //   return {list: [...state.list, new_dict_list]}
-    // }
-    
+    case "dict/DELETE": {
+      const new_dict_list = state.list.filter((l, idx) => {
+        return action.id !== l.id;
+      });
+      return { ...state, list: new_dict_list };
+      // 여기서 list의 value로는 spread 할당을 해주면 안됨.
+      // 기존 list와 new_dict_list의 차이는 지워야할 객체가 있냐없냐인데
+      // ...state.list를 해버리면 지워야할 객체를 함께 담아버리는꼴임.
+    }
+
     // case "dict/UPDATE": {
     //   const new_dict = action
     //   const new_dict_list = state.list.map((l,idx) => {
@@ -99,7 +129,7 @@ export default function reducer(state = initialState, action) {
     // }
 
     case "dict/SCROLL":
-      return {...state, scroll: action.scroll};
+      return { ...state, scroll: action.scroll };
 
     default:
       return state;
