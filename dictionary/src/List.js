@@ -5,7 +5,7 @@ import CreateIcon from "@material-ui/icons/Create";
 import { Link } from "react-router-dom";
 import { Card, Typography, CardContent } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteDictFB } from "./redux/modules/dict";
+import { deleteDictFB, modalOpen } from "./redux/modules/dict";
 import Edit from "./Edit";
 
 const List = (props) => {
@@ -13,17 +13,8 @@ const List = (props) => {
   const shouldScroll = useSelector((state) => state.dict.scroll);
   const scrollTarget = useRef();
   const dispatch = useDispatch();
-  const [open, setOpen] = useState(false);
   const [oneDict, setOneDict] = useState({});
   const [dictId, setDictID] = useState("");
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   React.useEffect(() => {}, []);
 
@@ -94,7 +85,7 @@ const List = (props) => {
                 right: "45px",
               }}
               onClick={() => {
-                handleOpen();
+                dispatch(modalOpen(true));
                 callOneDict(l.id);
                 setDictID(l.id);
               }}
@@ -169,12 +160,7 @@ const List = (props) => {
         </IconButton>
       </Link>
 
-      <Edit
-        handleClose={handleClose}
-        open={open}
-        oneDict={oneDict}
-        dictId={dictId}
-      ></Edit>
+      <Edit oneDict={oneDict} dictId={dictId}></Edit>
     </ListWrap>
   );
 };

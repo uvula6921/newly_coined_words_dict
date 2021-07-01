@@ -4,6 +4,8 @@ import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import Write from "./Write";
+import { modalOpen } from "./redux/modules/dict";
+import { useDispatch, useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -19,25 +21,35 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Edit = ({ handleClose, open, oneDict, dictId }) => {
+const Edit = ({ oneDict, dictId }) => {
+  const editModalOpen = useSelector((state) => state.dict.modalOpen);
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const handleModalClose = () => {
+    dispatch(modalOpen(false));
+  };
+
   return (
     <div>
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         className={classes.modal}
-        open={open}
-        onClose={handleClose}
+        open={editModalOpen}
+        onClose={handleModalClose}
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500,
         }}
       >
-        <Fade in={open}>
+        <Fade in={editModalOpen}>
           <div className={classes.paper}>
-            <Write isEdit={open} oneDict={oneDict} dictId={dictId}></Write>
+            <Write
+              isEdit={editModalOpen}
+              oneDict={oneDict}
+              dictId={dictId}
+            ></Write>
           </div>
         </Fade>
       </Modal>

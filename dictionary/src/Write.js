@@ -6,6 +6,7 @@ import "./Write.css";
 import { useDispatch } from "react-redux";
 import { createDictFB, updateDictFB } from "./redux/modules/dict";
 import { withRouter } from "react-router";
+import { modalOpen } from "./redux/modules/dict";
 
 const Write = (props) => {
   const [wordEmpty, setWordEmpty] = useState(false);
@@ -17,6 +18,10 @@ const Write = (props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {}, []);
+
+  const handleModalClose = () => {
+    dispatch(modalOpen(false));
+  };
 
   const submit = () => {
     if (
@@ -33,6 +38,7 @@ const Write = (props) => {
             exam: examInput.current.value,
           })
         );
+        handleModalClose();
       } else {
         dispatch(
           createDictFB({

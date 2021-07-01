@@ -7,10 +7,12 @@ const CREATE = "dict/CREATE";
 const DELETE = "dict/DELETE";
 const UPDATE = "dict/UPDATE";
 const SCROLL = "dict/SCROLL";
+const OPEN = "dict/OPEN";
 
 const initialState = {
   list: [],
   scroll: false,
+  modalOpen: false,
 };
 
 // Action Creators
@@ -32,6 +34,10 @@ export const updateDict = (dict) => {
 
 export const scroll = (scroll) => {
   return { type: SCROLL, scroll };
+};
+
+export const modalOpen = (open) => {
+  return { type: OPEN, open };
 };
 
 export const loadDictFB = () => {
@@ -164,6 +170,9 @@ export default function reducer(state = initialState, action) {
 
     case "dict/SCROLL":
       return { ...state, scroll: action.scroll };
+
+    case "dict/OPEN":
+      return { ...state, modalOpen: action.open };
 
     default:
       return state;
