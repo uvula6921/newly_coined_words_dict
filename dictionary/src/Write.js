@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { TextField, Button } from "@material-ui/core";
 import SaveIcon from "@material-ui/icons/Save";
-import "./Write.css";
 import { useDispatch } from "react-redux";
 import { createDictFB, updateDictFB } from "./redux/modules/dict";
 import { withRouter } from "react-router";

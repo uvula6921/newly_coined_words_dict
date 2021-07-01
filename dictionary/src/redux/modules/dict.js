@@ -40,7 +40,15 @@ export const modalOpen = (open) => {
   return { type: OPEN, open };
 };
 
-export const loadDictFB = () => {
+// export const setPage = (page) => {
+//   return { type: PAGE, page };
+// };
+
+// export const setLoading = (loading) => {
+//   return { type: LOADING, loading };
+// };
+
+export const loadDictFB = (count) => {
   return function (dispatch) {
     dict_db.get().then((docs) => {
       let dict_data = [];
@@ -61,7 +69,7 @@ export const loadDictFB = () => {
           // data를 리덕스 스토어에 넣고 created_at에 의해 정렬될 수 있게 한다.
         }
       });
-      dispatch(loadDict(dict_data));
+      dispatch(loadDict(dict_data.slice(count - 5, count)));
     });
   };
 };
@@ -80,7 +88,7 @@ export const createDictFB = (dict) => {
             created_at: doc._delegate._document.version.timestamp.seconds,
           };
           dispatch(createDict(adding_dict));
-          dispatch(scroll(true));
+          // dispatch(scroll(true));
         });
     });
   };
@@ -137,14 +145,14 @@ export default function reducer(state = initialState, action) {
     // do reducer stuff
     case "dict/LOAD": {
       if (action.dict.length) {
-        return { ...state, list: action.dict };
+        return { ...state, list: [...state.list, ...action.dict] };
       }
       return state;
     }
 
     case "dict/CREATE":
-      const new_dict_list = [...state.list, action.dict];
-      return { ...state, list: new_dict_list };
+      // const new_dict_list = [...state.list, action.dict];
+      return { ...state, list: [] };
 
     case "dict/DELETE": {
       const new_dict_list = state.list.filter((l, idx) => {

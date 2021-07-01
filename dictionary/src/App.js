@@ -12,14 +12,14 @@ const mapStateToProps = (state) => ({});
 
 const mapDispatchToProps = (dispatch) => ({
   load: () => {
-    dispatch(loadDictFB());
+    // dispatch(loadDictFB(5));
   },
   create: () => {},
 });
 
 class App extends React.Component {
   componentDidMount() {
-    this.props.load(); // 컴포넌트 최초 렌더링 시 db 데이터를 받아옴
+    // this.props.load(); // 컴포넌트 최초 렌더링 시 db 데이터를 받아옴
   }
 
   constructor(props) {

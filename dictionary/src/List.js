@@ -5,8 +5,9 @@ import CreateIcon from "@material-ui/icons/Create";
 import { Link } from "react-router-dom";
 import { Card, Typography, CardContent } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteDictFB, modalOpen } from "./redux/modules/dict";
+import { deleteDictFB, modalOpen, loadDictFB } from "./redux/modules/dict";
 import Edit from "./Edit";
+import FetchMore from "./FetchMore";
 
 const List = (props) => {
   const dict_list = useSelector((state) => state.dict.list);
@@ -15,8 +16,15 @@ const List = (props) => {
   const dispatch = useDispatch();
   const [oneDict, setOneDict] = useState({});
   const [dictId, setDictID] = useState("");
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  React.useEffect(() => {}, []);
+  useEffect(async () => {
+    console.log(page);
+    setLoading(true);
+    dispatch(loadDictFB(page));
+    setLoading(false);
+  }, [page]);
 
   const callOneDict = (id) => {
     const selectedDict = dict_list.filter((l, idx) => {
@@ -161,6 +169,7 @@ const List = (props) => {
       </Link>
 
       <Edit oneDict={oneDict} dictId={dictId}></Edit>
+      <FetchMore loading={page !== 0 && loading} setPage={setPage} />
     </ListWrap>
   );
 };
