@@ -31,7 +31,6 @@ const List = (props) => {
       window.location.reload(); // /write 페이지로 갔다가 다시 돌아왔을때 렌더링에 문제가 있어서 임시로 새로고침 처리함.
       dispatch(reload(false));
     }
-    return;
   }, []);
 
   useEffect(async () => {

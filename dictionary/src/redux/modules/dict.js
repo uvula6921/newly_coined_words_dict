@@ -46,14 +46,6 @@ export const reload = (reload) => {
   return { type: RELOAD, reload };
 };
 
-// export const setPage = (page) => {
-//   return { type: PAGE, page };
-// };
-
-// export const setLoading = (loading) => {
-//   return { type: LOADING, loading };
-// };
-
 export const loadDictFB = (count) => {
   return function (dispatch) {
     dict_db.get().then((docs) => {
