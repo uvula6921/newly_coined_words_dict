@@ -3,9 +3,13 @@ import styled from "styled-components";
 import { TextField, Button } from "@material-ui/core";
 import SaveIcon from "@material-ui/icons/Save";
 import { useDispatch } from "react-redux";
-import { createDictFB, updateDictFB } from "./redux/modules/dict";
+import {
+  createDictFB,
+  updateDictFB,
+  modalOpen,
+  reload,
+} from "./redux/modules/dict";
 import { withRouter } from "react-router";
-import { modalOpen } from "./redux/modules/dict";
 
 const Write = (props) => {
   const [wordEmpty, setWordEmpty] = useState(false);
@@ -16,7 +20,12 @@ const Write = (props) => {
   const examInput = useRef();
   const dispatch = useDispatch();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (props.match.path === "/write") {
+      dispatch(reload(true));
+    }
+    return;
+  }, []);
 
   const handleModalClose = () => {
     dispatch(modalOpen(false));
@@ -46,6 +55,7 @@ const Write = (props) => {
             exam: examInput.current.value,
           })
         );
+        dispatch(reload(false));
         props.history.push("/");
       }
     } else {

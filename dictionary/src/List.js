@@ -5,9 +5,15 @@ import CreateIcon from "@material-ui/icons/Create";
 import { Link } from "react-router-dom";
 import { Card, Typography, CardContent } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteDictFB, modalOpen, loadDictFB } from "./redux/modules/dict";
+import {
+  deleteDictFB,
+  modalOpen,
+  loadDictFB,
+  reload,
+} from "./redux/modules/dict";
 import Edit from "./Edit";
 import FetchMore from "./FetchMore";
+import { withRouter } from "react-router";
 
 const List = (props) => {
   const dict_list = useSelector((state) => state.dict.list);
@@ -18,9 +24,17 @@ const List = (props) => {
   const [dictId, setDictID] = useState("");
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
+  const reload = useSelector((state) => state.dict.reload);
+
+  useEffect(() => {
+    if (reload) {
+      window.location.reload(); // /write 페이지로 갔다가 다시 돌아왔을때 렌더링에 문제가 있어서 임시로 새로고침 처리함.
+      dispatch(reload(false));
+    }
+    return;
+  }, []);
 
   useEffect(async () => {
-    console.log(page);
     setLoading(true);
     dispatch(loadDictFB(page));
     setLoading(false);
@@ -178,4 +192,4 @@ const ListWrap = styled.div`
   padding-top: 30px;
 `;
 
-export default List;
+export default withRouter(List);

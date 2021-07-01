@@ -8,11 +8,13 @@ const DELETE = "dict/DELETE";
 const UPDATE = "dict/UPDATE";
 const SCROLL = "dict/SCROLL";
 const OPEN = "dict/OPEN";
+const RELOAD = "dict/RELOAD";
 
 const initialState = {
   list: [],
   scroll: false,
   modalOpen: false,
+  reload: false,
 };
 
 // Action Creators
@@ -38,6 +40,10 @@ export const scroll = (scroll) => {
 
 export const modalOpen = (open) => {
   return { type: OPEN, open };
+};
+
+export const reload = (reload) => {
+  return { type: RELOAD, reload };
 };
 
 // export const setPage = (page) => {
@@ -88,7 +94,7 @@ export const createDictFB = (dict) => {
             created_at: doc._delegate._document.version.timestamp.seconds,
           };
           dispatch(createDict(adding_dict));
-          // dispatch(scroll(true));
+          dispatch(scroll(true));
         });
     });
   };
@@ -181,6 +187,9 @@ export default function reducer(state = initialState, action) {
 
     case "dict/OPEN":
       return { ...state, modalOpen: action.open };
+
+    case "dict/RELOAD":
+      return { ...state, reload: action.reload };
 
     default:
       return state;
